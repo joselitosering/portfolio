@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Joselito Sering — Resume Dashboard (HTML V2)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root{
+    --bg:#0e121a; --panel:#141a22; --glass:#162032; --ink:#eaf2ff; --sub:#9bb0c3;
+    --accent:#ffcc4d; --accent2:#6be675; --line:#1f2a3d; --chip:#1a2638;
+  }
+  html,body{height:100%}
+  body{background:var(--bg); color:var(--ink)}
+  /* flip */
+  .flip{perspective:1200px}
+  .flip-inner{position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .flipped .flip-inner{transform:rotateY(180deg)}
+  .face{backface-visibility:hidden}
+  .back{transform:rotateY(180deg)}
+  /* aurora */
+  @keyframes floatA{0%{transform:translate(-20%,-10%)}50%{transform:translate(10%,10%)}100%{transform:translate(-20%,-10%)}}
+  @keyframes floatB{0%{transform:translate(10%,-10%)}50%{transform:translate(-10%,20%)}100%{transform:translate(10%,-10%)}}
+  /* hologram fx */
+  @keyframes scanY { 0%{ background-position-y:0 } 100%{ background-position-y:8px } }
+  @keyframes shimmer { 0%{ background-position:-150% 0 } 100%{ background-position:150% 0 } }
+  @keyframes pulse { 0%,100%{ opacity:.45 } 50%{ opacity:.9 } }
+  @keyframes sweep { 0%{ stroke-dashoffset: 240 } 100%{ stroke-dashoffset: 0 } }
+  .scanlines{ background-image: repeating-linear-gradient(180deg, transparent 0 2px, rgba(147,169,191,.15) 2px 3px); animation: scanY 1.6s linear infinite; }
+  .shimmer{ background: linear-gradient(110deg, transparent 0, rgba(255,255,255,.12) 12%, transparent 22%); background-size: 200% 100%; animation: shimmer 4.8s linear infinite; }
+  .holoDots{ background-image: radial-gradient(circle at 2px 2px, rgba(161,221,255,.18) 1px, transparent 1.5px); background-size: 14px 14px; filter: drop-shadow(0 0 2px rgba(63,214,255,.35)); opacity:.12 }
+
+  /* PRINT — 2‑page resume */
+  @media print {
+    @page { size: Letter; margin: 0.5in; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body{ background:#fff; color:#111; }
+    .pointer-events-none, .scanlines, .shimmer, .holoDots { display:none !important; }
+    /* flatten flip cards */
+    .flip-inner{ transform:none !important; }
+    .back{ display:none !important; }
+    .face{ position:static !important; }
+    .min-h-\[220px\]{ min-height: 0 !important; }
+    /* simple borders */
+    .border-\[var\(--line\)\]{ border-color:#e5e7eb !important; }
+    /* layout: single column flow */
+    .grid{ display:block !important; }
+    aside, main, section{ break-inside: avoid; }
+    /* header chart hidden to save space */
+    #holo{ display:none !important; }
+    /* contact text visible */
+    .print-contact{ display:inline !important; font-size:12px; margin-left:6px; color:#111 }
+    /* chips denser */
+    #skills span, #software span, #equipment span, #soft span{ font-size:9px !important; padding:.1rem .35rem !important; border-color:#d1d5db !important; background:#fff !important; color:#111 !important; }
+    #software, #equipment{ grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+    /* verticals & employment grids for print */
+    #verticals{ display:grid !important; grid-template-columns: repeat(2, minmax(0,1fr)) !important; gap: 10px !important; }
+    #employment{ display:grid !important; grid-template-columns: repeat(2, minmax(0,1fr)) !important; gap: 10px !important; }
+    /* limit employment to first 6 */
+    #employment > *:nth-child(n+7){ display:none !important; }
+    /* force page 2 for employment */
+    #employmentSection{ break-before: page; }
+    /* hide download button */
+    button{ display:none !important; }
+    /* headings subtle */
+    h1,h2{ color:#111 !important; }
+    .text-\[\#c7d5e6\]{ color:#333 !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen font-sans relative overflow-x-hidden">
+  <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] relative">
+    <!-- Sidebar -->
+    <aside class="order-2 lg:order-1 bg-[#0b1018] backdrop-blur border-r border-[var(--line)] p-6 flex flex-col gap-6 z-10">
+      <div class="flex items-start gap-4">
+        <div>
+          <h1 class="text-xl font-bold tracking-wide">JOSELITO SERING</h1>
+          <p class="text-sm text-[var(--sub)]">Creative Technologist • Quant Systems Engineer</p>
+        </div>
+      </div>
+      <!-- icon row -->
+      <div class="flex items-center gap-2">
+        <a href="mailto:joselitosering@me.com" class="p-2 rounded-lg bg-[var(--chip)] border border-[var(--line)] flex items-center gap-1" aria-label="Email">
+          <i data-lucide="mail"></i><span class="print-contact" style="display:none">joselitosering@me.com</span>
+        </a>
+        <a href="https://linkedin.com/in/joselitosering" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[var(--chip)] border border-[var(--line)] flex items-center gap-1" aria-label="Website">
+          <i data-lucide="globe"></i><span class="print-contact" style="display:none">linkedin.com/in/joselitosering</span>
+        </a>
+        <a href="tel:+14159943315" class="p-2 rounded-lg bg-[var(--chip)] border border-[var(--line)] flex items-center gap-1" aria-label="Phone">
+          <i data-lucide="phone"></i><span class="print-contact" style="display:none">+1 (415) 994‑3315</span>
+        </a>
+      </div>
+
+      <div>
+        <h3 class="text-xs uppercase tracking-wide text-[var(--sub)]">Core Skills</h3>
+        <div id="skills" class="mt-2 mb-2 flex flex-wrap gap-2"></div>
+        <div class="grid gap-4">
+          <div>
+            <p class="text-[10px] uppercase tracking-wide text-[var(--sub)]">Software & Platforms</p>
+            <div id="software" class="mt-1 grid grid-cols-2 gap-1.5"></div>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase tracking-wide text-[var(--sub)]">Equipment</p>
+            <div id="equipment" class="mt-1 grid grid-cols-2 gap-1.5"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xs uppercase tracking-wide text-[var(--sub)]">Soft Skills</h3>
+        <div id="soft" class="mt-2 flex flex-wrap gap-2"></div>
+      </div>
+      <button onclick="window.print()" class="px-4 py-2 rounded-lg font-semibold bg-gradient-to-b from-yellow-300 to-yellow-500 text-black">Download PDF</button>
+    </aside>
+
+    <!-- Main -->
+    <main class="order-1 lg:order-2 p-6 lg:p-8 flex flex-col gap-8 z-10">
+      <!-- Hero with Hologram Chart -->
+      <section class="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
+        <div class="grid md:grid-cols-[1.5fr_1fr] gap-4 items-center">
+          <div>
+            <h2 class="text-3xl md:text-4xl font-extrabold">Discover my AI · XR · Fintech space</h2>
+            <p class="text-[#c7d5e6] mt-2 max-w-prose">I build generative media systems, AI multi‑agent pipelines for software + venture creation, and an intraday quant stack with ChatGPT, GitHub, VS Code, n8n, ThinkOrSwim, NinjaTrader, TradingView, Tradovate, Coinbase, and Schwab.</p>
+            <div class="flex gap-6 mt-4 text-center">
+              <div class="flex flex-col items-center"><div class="text-2xl font-extrabold text-yellow-400">20+</div><div class="text-xs text-[#c7d5e6]">Years</div></div>
+              <div class="flex flex-col items-center"><div class="text-2xl font-extrabold text-yellow-400">100+</div><div class="text-xs text-[#c7d5e6]">Productions</div></div>
+              <div class="flex flex-col items-center"><div class="text-2xl font-extrabold text-yellow-400">50+</div><div class="text-xs text-[#c7d5e6]">Partners</div></div>
+              <div class="flex flex-col items-center"><div class="text-2xl font-extrabold text-yellow-400">10+</div><div class="text-xs text-[#c7d5e6]">Honors</div></div>
+            </div>
+          </div>
+          <!-- HOLOGRAM CHART CONTAINER -->
+          <div id="holo" class="relative h-40 rounded-xl border border-[var(--line)] overflow-hidden bg-[#0f1524]" style="transform:perspective(900px) rotateX(0.8deg)">
+            <div class="absolute -top-16 -left-24 w-[60%] h-[160%] rounded-full blur-3xl opacity-25" style="background:radial-gradient(circle at 30% 30%, #0bd1ff, transparent 60%)"></div>
+            <div class="absolute -bottom-24 -right-24 w-[60%] h-[160%] rounded-full blur-3xl opacity-20" style="background:radial-gradient(circle at 70% 70%, #6be675, transparent 55%)"></div>
+            <div class="absolute inset-0 holoDots"></div>
+            <!-- chart layers will be injected by JS -->
+            <div class="absolute inset-0 p-3 grid content-end gap-2.5 grid-cols-4 md:grid-cols-8 auto-rows-min">
+              <!-- Each chip is full‑width, centered to distribute labels evenly across columns -->
+              <!-- Science (atom) -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <circle cx="12" cy="12" r="2"/>
+                  <ellipse cx="12" cy="12" rx="9" ry="5"/>
+                  <ellipse cx="12" cy="12" rx="9" ry="5" transform="rotate(60 12 12)"/>
+                  <ellipse cx="12" cy="12" rx="9" ry="5" transform="rotate(-60 12 12)"/>
+                </svg>
+                <span class="whitespace-nowrap">Science</span>
+              </span>
+              <!-- Math (line chart) -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <path d="M3 17l6-6 4 2 8-8"/>
+                  <path d="M3 21h18"/>
+                </svg>
+                <span class="whitespace-nowrap">Math</span>
+              </span>
+              <!-- Technology (rocket) -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <path d="M4 13l-2 7 7-2 9-9a5 5 0 10-7-7l-9 9z"/>
+                  <path d="M14 7l3 3"/>
+                  <circle cx="14.5" cy="6.5" r="1.3"/>
+                </svg>
+                <span class="whitespace-nowrap">Technology</span>
+              </span>
+              <!-- Nature (leaf) -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <path d="M3 21c6-6 12-6 18-12-6 6-6 12-12 18"/>
+                  <path d="M3 21c8-8 12-12 12-12"/>
+                </svg>
+                <span class="whitespace-nowrap">Nature</span>
+              </span>
+              <!-- Art (film/grid) -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <rect x="3" y="5" width="18" height="14" rx="2"/>
+                  <path d="M9 5v14M15 5v14M3 9h18M3 15h18"/>
+                </svg>
+                <span class="whitespace-nowrap">Art</span>
+              </span>
+              <!-- History (newspaper) -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <path d="M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7H6a2 2 0 0 0-2 2z"/>
+                  <path d="M16 3H6a2 2 0 0 0-2 2v12"/>
+                  <path d="M8 11h8M8 15h8M8 7h4"/>
+                </svg>
+                <span class="whitespace-nowrap">History</span>
+              </span>
+              <!-- Philosophy (book) inline SVG -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                  <path d="M4 4v15.5"/>
+                  <path d="M20 22V6H6.5A2.5 2.5 0 0 0 4 8.5"/>
+                </svg>
+                <span class="whitespace-nowrap">Philosophy</span>
+              </span>
+              <!-- Humor (music note) -->
+              <span class="inline-flex w-full items-center justify-center gap-1 px-2 py-1 text-[11px] rounded-md border border-[var(--line)] bg-[#141a22]/80 backdrop-blur">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7eaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0">
+                  <path d="M9 18V5l10-2v13"/>
+                  <circle cx="7" cy="18" r="2"/>
+                  <circle cx="19" cy="16" r="2"/>
+                </svg>
+                <span class="whitespace-nowrap">Humor</span>
+              </span>
+            </div>
+            <div class="absolute inset-0 scanlines pointer-events-none"></div>
+            <div class="absolute inset-0 shimmer opacity-20 pointer-events-none"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Current Projects -->
+      <section>
+        <h3 class="text-xs uppercase tracking-wide text-[var(--sub)] mb-3">Current Projects</h3>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <a href="https://aira-music-label.square.site" target="_blank" rel="noopener noreferrer" class="group block rounded-2xl border border-[var(--line)] bg-[color:var(--panel)]/90 p-4 hover:border-[#3fd6ff] transition">
+            <div class="flex items-center gap-3">
+              <span class="p-2 rounded-lg bg-[var(--chip)] border border-[var(--line)]"><i data-lucide="sparkles"></i></span>
+              <div>
+                <p class="font-semibold">GenAI</p>
+                <p class="text-xs text-[var(--sub)]">Generative media systems · AIRA label</p>
+              </div>
+            </div>
+          </a>
+          <a href="http://joselitosering.wordpress.com" target="_blank" rel="noopener noreferrer" class="group block rounded-2xl border border-[var(--line)] bg-[color:var(--panel)]/90 p-4 hover:border-[#3fd6ff] transition">
+            <div class="flex items-center gap-3">
+              <span class="p-2 rounded-lg bg-[var(--chip)] border border-[var(--line)]"><i data-lucide="scan-line"></i></span>
+              <div>
+                <p class="font-semibold">XRM</p>
+                <p class="text-xs text-[var(--sub)]">XR concepts for sport · medicine · exploration</p>
+              </div>
+            </div>
+          </a>
+          <a href="https://linkedin.com/in/joselitosering" target="_blank" rel="noopener noreferrer" class="group block rounded-2xl border border-[var(--line)] bg-[color:var(--panel)]/90 p-4 hover:border-[#3fd6ff] transition">
+            <div class="flex items-center gap-3">
+              <span class="p-2 rounded-lg bg-[var(--chip)] border border-[var(--line)]"><i data-lucide="line-chart"></i></span>
+              <div>
+                <p class="font-semibold">FinTech</p>
+                <p class="text-xs text-[var(--sub)]">Quant stack · research automation · execution</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Professional Verticals -->
+      <section>
+        <h3 class="text-xs uppercase tracking-wide text-[var(--sub)] mb-3">Professional Verticals</h3>
+        <div id="verticals" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- Employment History -->
+      <section id="employmentSection">
+        <h3 class="text-xs uppercase tracking-wide text-[var(--sub)] mb-3">Employment History</h3>
+        <div id="employment" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      
+    </main>
+  </div>
+
+<script>
+  // --- CORE SKILLS ---
+  const CORE_SKILLS = [
+    "AI Agent Development","AV Systems","Cinematography","Copywriting","Creative Direction","Generative AI","Graphic Design","Grant Writing","Instructional Design","Motion Design","Multi-Agentic Management","Project Management","Proposals/RFPs","Quant Research","Software Development","Studio Recording","Trading Automation","User Experience","User Interface","Video Production","XR/AR"
+  ].sort((a,b)=> a.localeCompare(b));
+
+  // --- SOFTWARE (grouped, alphabetized within each, no visible headers) ---
+  const SOFTWARE_GROUPS = [
+    {group:"AI / Agents / Orchestration", items:["AI Agents","API management","ChatGPT","GitHub Actions","n8n"]},
+    {group:"Dev & Web", items:["CSS","GitHub","HTML","JavaScript","Visual Studio Code","XML"]},
+    {group:"Generative Media", items:["AIVA","11Labs","Kits","Kling","Midjourney","Runway ML","Sora","Suno","Veo3"]},
+    {group:"AV / Live / Broadcast", items:["Disguise One","Milumin","OBS","Resolume","Vectorworks"]},
+    {group:"Creative / DCC", items:["Adobe Creative Suite","After Effects","DaVinci Resolve","Final Cut Pro","Illustrator","Photoshop"]},
+    {group:"Audio / Music", items:["Ableton Live","Logic Pro","MIDI","Pro Tools","Reason","Reactor"]},
+    {group:"Fintech / Trading", items:["Coinbase","NinjaTrader","Schwab","ThinkOrSwim","Tradovate","TradingView (Pine)"]},
+    {group:"Learning Platforms", items:["Facebook Blueprint","LinkedIn"]},
+  ];
+
+  // --- EQUIPMENT (grouped, alphabetized within each, no visible headers) ---
+  const EQUIPMENT_GROUPS = [
+    {group:"Video / Display", items:["LED display wall","Live camera operation","Projection systems"]},
+    {group:"Stage / Show", items:["Teleprompter","Sony HDC Series","Panasonic AK","Grass Valley LDX","Blackmagic","Allen & Heath","Yamaha","Shure","AJA"]},
+    {group:"Audio / Instruments / Performance", items:["DJ Gear","Drums","Foot Pedals","Guitars","Live Audio","Soundboards"]},
+    {group:"Capture / FX", items:["Motion Capture"]},
+    {group:"Streaming / Record", items:["Live streaming / capture","Streaming encoders (Pearl Mini)"]},
+    {group:"General Show Ops", items:["Vectorworks Blueprints","ShoFlo Management"]},
+  ];
+
+  // --- SOFT SKILLS ---
+  const softSkills = ["Stakeholder Management","Program/Project Management","Leadership","Teaching & Mentoring","Cross‑functional Collaboration","Communication","Storytelling","Problem Solving","Critical Thinking","Adaptability","Cultural Competence","Public Speaking","Writing & Editing"]; 
+
+  // --- VERTICALS ---
+  const verticals = [
+    { id:"gen-media", title:"Generative Media", subtitle:"Suno • Midjourney • Post", icon:"film", front:"Ship cohesive audio/visual releases and motion pipelines; publish to Spotify/YouTube with consistent metadata.", highlights:[
+      "AI Recording Artists (AIRA) music label",
+      "AI Modeling Agency (AIMA) fashion magazine",
+      "Love Letter Templates - Animation Saga",
+      "Prompt libraries for songs, cues, artwork",
+      "Audio mix & mastering workflow",
+      "Visual identity kits across releases"
+    ], tags:["Suno","Midjourney","LLM"] },
+    { id:"ai-agents", title:"AI Multi‑Agent Management Expert", subtitle:"Agent Dev • Multi‑Modal Workflow Orchestration", icon:"brain", front:"Design and steer autonomous + tool‑using AI agents that ship software and stand up new ventures. Compose pipelines that talk to repos, CI, data, and cloud—ideas → deploys overnight.", highlights:["LLM routers, planners, memory graphs","Spec → tests → code → review → docs sandboxes","Governance: safety rails, evals, audit logs","Orchestration: n8n, Actions, vector/RAG, webhooks","Research lanes: AI, quantum, space, bionics/robotics, blockchain, 3D manufacturing"], tags:["Agents","Orchestration","RAG","MLOps"] },
+    { id:"av", title:"AV/Broadcast", subtitle:"LED • Projection • Hybrid", icon:"tv-2", front:"Dreamforce keynotes, Moscone builds, show calling, graphics playback, live capture.", highlights:["Milumin • Resolume • OBS • Pearl Mini","Run‑of‑show docs & playbooks","Rapid on‑site troubleshooting"], tags:["LED","Projection","Streaming","Show Ops"] },
+    { id:"fintech", title:"Fintech Automation", subtitle:"LLM • n8n • Trading Stack", icon:"line-chart", front:"Self‑taught intraday trading quant: automate research, journaling, and execution integrations.", highlights:["n8n + ChatGPT research agents","ThinkOrSwim • NinjaTrader • TradingView","Risk overlays & reporting modules"], tags:["LLM","n8n","Risk","Backtests"] },
+    { id:"idsys", title:"Instructional Systems", subtitle:"LinkedIn • Meta", icon:"presentation", front:"Enterprise learning at scale: localization to 9 languages, reusable content models, VILT/video/microsites.", highlights:["Blueprint e‑learning, ~4× throughput","Workflow optimization white paper","Metrics & QA gates for content ops"], tags:["L&D","Localization","Automation"] },
+    { id:"martial-arts", title:"Martial Arts", subtitle:"Filipino Martial Arts (Sabong Federation)", icon:"swords", front:"Community leadership and cultural research; training meetups and media documenting FMA practice.", highlights:["Organize SF Bay Area sessions","Safety & pedagogy playbooks","Articles/videos on heritage & practice"], tags:["FMA","Community","Safety"] },
+    { id:"movies", title:"Movies / Film", subtitle:"Writer–Producer–Director", icon:"clapperboard", front:"Feature & short‑form projects including Love Letter Templates; festival mentions and distribution consideration.", highlights:["Narrative + generative techniques","On‑set/post workflows","Soundtrack coordination"], tags:["Director","Producer","Soundtrack"] },
+    { id:"music", title:"Music / Recording", subtitle:"AIRÁ Label • Spotify/YouTube • Studio", icon:"music-3", front:"Original releases and film cues; catalog and label operations; studio and live recording.", highlights:["Studio tracking (vocals/instruments), mic techniques, preamp/AD chain","Session management, edits/comping, gain staging, creative FX","Mix/master deliverables: stems, ISRC/metadata, streaming loudness"], tags:["Recording","Mix/Master","Label","Spotify"] },
+    { id:"magazine", title:"Magazine / Publishing", subtitle:"Fred Perry Subculture • Leaf Group", icon:"newspaper", front:"Music/culture features, how‑to publishing, and editorial workflow contributions across online magazines.", highlights:["Pitch → research → publish","SEO‑conscious copy & media","Cross‑platform distribution"], tags:["Editorial","Copy","SEO"] }
+  ];
+
+  // --- EMPLOYMENT ---
+  const employment = [
+    // 1 — IATSE Local 16 (present)
+    { role:"Technical Director / Lead AV Engineer", org:"IATSE Local 16", dates:"Feb 2022 – Present · San Francisco", bullets:[
+      "IATSE Local 16 — LED/Projection ops; live capture; run‑of‑show docs",
+      "IATSE Local 16 — Dreamforce keynotes; Moscone multi‑client builds",
+      "IATSE Local 16 — Graphics playback: Milumin / Resolume / OBS / Pearl Mini"
+    ] },
+
+    // 2 — Broadcast & Editorial (consolidated)
+    { role:"Writer–Producer (Broadcast/Editorial)", org:"Current TV • Fred Perry Subculture • Leaf Group", dates:"2008 – 2009 · Editorial freelance ongoing", bullets:[
+      "Current TV — Broadcast promos & short‑form docs",
+      "Fred Perry Subculture — Music/culture features & essays",
+      "Leaf Group — How‑to and lifestyle publishing"
+    ] },
+
+    // 3 — Ex’pression College
+    { role:"Director / Instructor (Media Theory, UI/UX & Sound Design)", org:"Ex’pression College", dates:"2001 – 2007", bullets:[
+      "Ex’pression College — Course Director, Media Theory; curriculum leadership",
+      "Ex’pression College — Live/event & streaming systems for instruction",
+      "Ex’pression College — Student mentorship and assessment"
+    ] },
+
+    // 4 — Producer / Interactive (consolidated)
+    { role:"Producer / Interactive", org:"Korn Ferry (Ninth House) • EPC Consultants • Extreme Reach", dates:"1997 – 2001", bullets:[
+      "Korn Ferry (Ninth House) — eLearning media production & QA supervision",
+      "EPC Consultants — SFO IT PR plan; international liaison & research",
+      "Extreme Reach — National broadcast ad traffic & client services"
+    ] },
+
+    // 5 — Educator (Scholar)
+    { role:"Educator (Scholar)", org:"San Francisco State University • Independent Workshops", dates:"University years (SFSU)", bullets:[
+      "Honors: Chancellor's Award, UPASA Scholarship, Atkinson Foundation Grant",
+      "Facilitated nationwide TED‑style workshops on pre‑colonial Philippine scripts",
+      "Student leadership & advocacy: CCSF Senator and USSA CA Representative to Washington, DC",
+      "Designed a Special Major in Philosophy of Science & Religion; led campus cultural programming and community outreach"
+    ] },
+
+    // 6 — Fun Facts
+    { role:"Fun Facts", org:"Highlights", dates:"Curated", bullets:[
+      "Feature film Love Letter Templates — Best Feature Experimental (Cult Movies International Film Festival)",
+      "North American Premiere at Arizona Underground Film Festival (2021)",
+      "Spotify artist with releases under AIRÁ label; active YouTube channel",
+      "Leads Sabong Federation FMA sparring sessions; hosted Many Styles 2023"
+    ] }
+  ];
+
+  // --- RENDER SIDEBAR ---
+  const skillsWrap = document.getElementById('skills');
+  CORE_SKILLS.forEach(k=>{ const pill=document.createElement('span'); pill.className='px-2 py-1 rounded-md border border-[var(--line)] bg-[var(--chip)] text-xs'; pill.textContent=k; skillsWrap.appendChild(pill); });
+
+  const softwareWrap = document.getElementById('software');
+  SOFTWARE_GROUPS.forEach(g=>{ [...g.items].sort((a,b)=>a.localeCompare(b)).forEach(s=>{ const chip=document.createElement('span'); chip.className='px-2 py-0.5 rounded-md border border-[var(--line)] bg-[#142033] text-[10px]'; chip.textContent=s; softwareWrap.appendChild(chip); }); });
+
+  const equipmentWrap = document.getElementById('equipment');
+  EQUIPMENT_GROUPS.forEach(g=>{ [...g.items].sort((a,b)=>a.localeCompare(b)).forEach(s=>{ const chip=document.createElement('span'); chip.className='px-2 py-0.5 rounded-md border border-[var(--line)] bg-[#142033] text-[10px]'; chip.textContent=s; equipmentWrap.appendChild(chip); }); });
+
+  const softWrap = document.getElementById('soft');
+  softSkills.forEach(k=>{ const pill=document.createElement('span'); pill.className='px-2 py-1 rounded-md border border-[var(--line)] bg-[var(--chip)] text-xs'; pill.textContent=k; softWrap.appendChild(pill); });
+
+  // --- Flip card factory ---
+  function iconNode(name){ const i=document.createElement('i'); i.setAttribute('data-lucide', name||'layers'); return i; }
+  function flipCard({title, subtitle, icon, front, highlights, tags, noScrollBack}){
+    const flip = document.createElement('div');
+    flip.className = 'flip select-none';
+    flip.tabIndex = 0; flip.setAttribute('role','button'); flip.setAttribute('aria-pressed','false');
+    const inner = document.createElement('div'); inner.className = 'flip-inner'; flip.appendChild(inner);
+    const frontEl = document.createElement('div'); frontEl.className = 'face border border-[var(--line)] bg-[color:var(--panel)]/90 backdrop-blur rounded-2xl p-4 min-h-[220px] relative';
+    const header = document.createElement('div'); header.className = 'flex items-center gap-3';
+    const icoWrap = document.createElement('span'); icoWrap.className = 'p-2 rounded-lg bg-[var(--chip)] border border-[var(--line)]';
+    const ico = iconNode(icon); icoWrap.appendChild(ico);
+    const txt = document.createElement('div');
+    const t = document.createElement('p'); t.className='font-semibold leading-tight'; t.textContent = title; txt.appendChild(t);
+    const s = document.createElement('p'); s.className='text-xs text-[color:var(--sub)]'; s.textContent = subtitle||''; txt.appendChild(s);
+    header.appendChild(icoWrap); header.appendChild(txt); frontEl.appendChild(header);
+    const p = document.createElement('p'); p.className='text-sm mt-3 text-[#c7d5e6]'; p.textContent = front||''; frontEl.appendChild(p);
+    const tagWrap = document.createElement('div'); tagWrap.className = 'flex flex-wrap gap-2 mt-3';
+    (tags||[]).forEach(t=>{ const sp=document.createElement('span'); sp.className='px-2 py-0.5 text-xs rounded-md border border-[var(--line)] bg-[var(--chip)]'; sp.textContent=t; tagWrap.appendChild(sp); });
+    frontEl.appendChild(tagWrap);
+    const hint = document.createElement('p'); hint.className='text-[11px] text-[color:var(--sub)] mt-3'; hint.textContent='Tap to flip →'; frontEl.appendChild(hint);
+    const backEl = document.createElement('div'); backEl.className = 'back face absolute inset-0 border border-[var(--line)] bg-[#121722]/95 backdrop-blur rounded-2xl p-4' + (noScrollBack ? '' : ' overflow-auto');
+    const bh = document.createElement('p'); bh.className='font-semibold'; bh.textContent='Highlights'; backEl.appendChild(bh);
+    const ul = document.createElement('ul'); ul.className='list-disc pl-5 mt-2 space-y-1 text-sm';
+    (highlights||[]).forEach(h=>{ const li=document.createElement('li'); li.textContent=h; ul.appendChild(li); });
+    backEl.appendChild(ul);
+    const hint2 = document.createElement('p'); hint2.className='text-[11px] text-[color:var(--sub)] mt-3'; hint2.textContent='Tap to return'; backEl.appendChild(hint2);
+    inner.appendChild(frontEl); inner.appendChild(backEl);
+    function toggle(){ flip.classList.toggle('flipped'); flip.setAttribute('aria-pressed', flip.classList.contains('flipped')); }
+    flip.addEventListener('click', toggle);
+    flip.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') { e.preventDefault(); toggle(); }});
+    return flip;
+  }
+
+  // Render verticals & employment
+  const vWrap = document.getElementById('verticals');
+  verticals.forEach(v=> vWrap.appendChild(flipCard({...v, noScrollBack: v.id === 'gen-media'})));
+  const eWrap = document.getElementById('employment');
+  employment.forEach(e=> eWrap.appendChild(flipCard({title:e.role, subtitle:e.org, icon:'briefcase-business', front:e.dates, highlights:e.bullets, tags:['Experience']})));
+
+  // Post-fixes: set no-scroll on Educator (Scholar) card & remove duplicate Employment section
+  (function afterRender(){
+    try {
+      const eWrap = document.getElementById('employment');
+      const eduIdx = employment.findIndex(e=> e.role === 'Educator (Scholar)');
+      if (eWrap && eduIdx >= 0 && eWrap.children[eduIdx]) {
+        const back = eWrap.children[eduIdx].querySelector('.back');
+        if (back) back.style.overflow = 'hidden';
+      }
+      const dup = Array.from(document.querySelectorAll('section')).filter(s => (s.querySelector('h3')||{}).textContent === 'Employment History');
+      if (dup.length > 1) { dup[1].remove(); }
+    } catch (err) { /* no-op */ }
+  })();
+
+  // --- HOLOGRAM CHART RENDER ---
+  (function renderHolo(){
+    const el = document.getElementById('holo');
+    if(!el) return;
+    const series = [72,73,74,73,75,76,78,77,79,82,81,83,86,85,88,90,89,92,94,93,96,97,96,98];
+    const padTop = 6, padBottom = 18;
+    const minP = Math.min(...series), maxP = Math.max(...series);
+    const yFor = (price)=>{ const t=(price-minP)/(maxP-minP||1); return (1-t)*(100-padTop-padBottom)+padTop; };
+    const xFor = (i)=> (i/(series.length-1))*100;
+    const hLevels = [0,25,50,75,100].map(p=> padTop + (p/100)*(100 - padTop - padBottom));
+    const vCount=6, vLevels = Array.from({length:vCount}, (_,i)=> (i/(vCount-1))*100);
+    const priceAtY = (y)=>{ const t=(y-padTop)/(100-padTop-padBottom); const v=maxP - t*(maxP-minP); return Math.round(v*10)/10; };
+    const n=7, sma=[], stdev=[];
+    for(let i=0;i<series.length;i++){
+      const start=Math.max(0,i-n+1); const slice=series.slice(start,i+1);
+      const avg=slice.reduce((s,v)=>s+v,0)/slice.length; sma.push(avg);
+      const variance=slice.reduce((s,v)=> s+(v-avg)*(v-avg),0)/slice.length; stdev.push(Math.sqrt(variance));
+    }
+    const k=1.8, upper=sma.map((m,i)=> m+k*stdev[i]), lower=sma.map((m,i)=> m-k*stdev[i]);
+    const linePath = (arr)=> arr.map((v,i)=> `${i===0?'M':'L'} ${xFor(i)} ${yFor(v)}`).join(' ');
+    const areaUnder = (arr)=>{ const top=arr.map((v,i)=> `${i===0?'M':'L'} ${xFor(i)} ${yFor(v)}`).join(' '); const bottom=`L 100 ${100-padBottom} L 0 ${100-padBottom} Z`; return top+' '+bottom; };
+    const bandArea = ()=>{ const up=upper.map((v,i)=> `${i===0?'M':'L'} ${xFor(i)} ${yFor(v)}`).join(' '); const lo=lower.slice().reverse().map((v,ri)=> `L ${xFor(series.length-1-ri)} ${yFor(v)}`).join(' '); return up+' '+lo+' Z'; };
+
+    const grid = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute inset-0 w-full h-full">
+      ${hLevels.map((y,i)=>`<line x1="0" y1="${y}" x2="100" y2="${y}" stroke="#8fe3ff" stroke-opacity="0.14" stroke-width="0.7" />`).join('')}
+      ${vLevels.map((x,i)=>`<line x1="${x}" y1="${padTop}" x2="${x}" y2="${100-padBottom}" stroke="#8fe3ff" stroke-opacity="0.10" stroke-width="0.5" />`).join('')}
+      ${hLevels.map((y,i)=>`<text x="98" y="${y-1.2}" font-size="3" text-anchor="end" fill="#b9ffe5">${priceAtY(y)}</text>`).join('')}
+    </svg>`;
+
+    const chart = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute inset-0 w-full h-full pointer-events-none">
+      <defs>
+        <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#3fd6ff" stop-opacity="0.38" />
+          <stop offset="100%" stop-color="#3fd6ff" stop-opacity="0.03" />
+        </linearGradient>
+        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#7dd3fc"/>
+          <stop offset="100%" stop-color="#a7f3d0"/>
+        </linearGradient>
+        <filter id="lineGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="1.8" result="blur" />
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path d="${bandArea()}" fill="#7dd3fc" opacity="0.10" />
+      <path d="${areaUnder(series)}" fill="url(#areaGrad)" />
+      <path d="${linePath(series)}" fill="none" stroke="url(#lineGrad)" stroke-width="1.8" filter="url(#lineGlow)" stroke-dasharray="240" stroke-dashoffset="240" style="animation:sweep 6s linear infinite" />
+      <path d="${linePath(sma)}" fill="none" stroke="#c1f0dd" stroke-opacity="0.75" stroke-width="0.8" />
+      <path d="${linePath(upper)}" fill="none" stroke="#7dd3fc" stroke-opacity="0.45" stroke-dasharray="2 2" stroke-width="0.8" />
+      <path d="${linePath(lower)}" fill="none" stroke="#7dd3fc" stroke-opacity="0.45" stroke-dasharray="2 2" stroke-width="0.8" />
+      ${series.map((v,i)=>`<circle cx="${xFor(i)}" cy="${yFor(v)}" r="0.9" fill="#b9ffe5" style="opacity:.65; filter:drop-shadow(0 0 2px #7dfcc2); animation:pulse ${3+(i%5)*0.2}s ease-in-out ${i*0.05}s infinite" />`).join('')}
+    </svg>`;
+
+    const corners = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute inset-0 w-full h-full pointer-events-none">
+      ${[[2,2],[98,2],[2,100-padBottom-2],[98,100-padBottom-2]].map(([x,y])=>`<g stroke="#7dd3fc" stroke-opacity="0.5" stroke-width="0.8"><line x1="${x}" y1="${y}" x2="${x+(x<50?4:-4)}" y2="${y}" /><line x1="${x}" y1="${y}" x2="${x}" y2="${y+(y<50?4:-4)}" /></g>`).join('')}
+    </svg>`;
+    el.insertAdjacentHTML('beforeend', grid + chart + corners);
+  })();
+
+  // Activate icons
+  lucide.createIcons();
+</script>
+</body>
+</html>
